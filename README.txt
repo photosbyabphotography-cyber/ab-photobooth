@@ -25,3 +25,9 @@ PRÓXIMO
 - Galería
 - Guardado de originales
 - Impresión/AirPrint
+
+
+V2.1
+- Corregido el encuadre de cámara en iPhone/iPad.
+- Vista real 4:3 sin zoom/crop artificial.
+- La vista previa ahora muestra el encuadre completo.
