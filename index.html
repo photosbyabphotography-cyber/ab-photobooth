@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#080808">
+<title>AB Photography Photobooth</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{
+  --bg:#080808;--panel:#111;--panel2:#171717;--gold:#bd8c4b;--gold2:#e2c08a;
+  --text:#f8f3ea;--muted:#a9a198;--line:#2b2b2b;--danger:#7f3d3d
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100%}
+body{min-height:100dvh;overflow:hidden}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.screen{display:none;min-height:100dvh;padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));background:
+radial-gradient(circle at 50% -15%,rgba(189,140,75,.16),transparent 34%),
+linear-gradient(#0b0b0b,#060606)}
+.screen.active{display:flex;flex-direction:column;align-items:center}
+#welcome,#done{justify-content:center}
+.monogram{font:italic 76px/.8 Georgia,serif;color:var(--gold2);letter-spacing:-8px}
+.brand{font-size:11px;letter-spacing:6px;color:var(--gold2);margin-top:15px}
+h1{font:400 clamp(32px,10vw,58px)/1 Georgia,serif;letter-spacing:5px;margin:35px 0 12px}
+.gold{color:var(--gold2)}
+.tag{letter-spacing:3px;font-size:13px;margin:0}
+.sub{letter-spacing:2.5px;font-size:11px;color:var(--gold);margin:8px 0 38px}
+.btn{border-radius:14px;border:1px solid var(--gold);padding:16px 18px;font-weight:650;letter-spacing:1.3px}
+.primary{background:linear-gradient(#c69b62,#9c6c33);color:white}
+.secondary{background:#161616;color:var(--text)}
+.ghost{background:transparent;color:var(--gold2)}
+.big{width:min(88vw,420px);min-height:86px}
+.hint{max-width:450px;color:var(--muted);font-size:12px;line-height:1.45;text-align:center}
+.top{width:100%;max-width:720px;display:grid;grid-template-columns:48px 1fr 48px;align-items:center;margin-bottom:12px}
+.icon{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:#151515;color:white;font-size:22px}
+.title{font-size:13px;letter-spacing:1.5px;text-align:center}
+.camera-wrap{position:relative;width:min(94vw,690px);height:min(66dvh,760px);overflow:hidden;border:1px solid var(--line);border-radius:24px;background:#111;box-shadow:0 18px 50px #0008}
+video,#demoView{width:100%;height:100%;object-fit:cover}
+video.mirror{transform:scaleX(-1)}
+#demoView{display:none;align-items:center;justify-content:center;background:
+linear-gradient(135deg,#231d18,#111 50%,#1e1710);font:italic 34px Georgia,serif;color:#d6b27b}
+#demoView.show{display:flex}
+.overlay{position:absolute;inset:0;pointer-events:none;border:1px solid rgba(226,192,138,.18);border-radius:24px}
+.countdown{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0004;font:700 min(40vw,230px)/1 Georgia,serif;text-shadow:0 4px 25px #000}
+.hidden{display:none!important}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.flash.fire{animation:fl .16s ease}
+@keyframes fl{30%{opacity:.95}100%{opacity:0}}
+.controls{display:flex;align-items:center;justify-content:center;gap:28px;padding:20px 0 5px}
+.shutter{width:76px;height:76px;border-radius:50%;background:#faf8f2;border:8px solid #0b0b0b;outline:3px solid var(--gold2)}
+.mini{width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:#151515;color:white}
+.progress{font-size:13px;letter-spacing:2px;color:var(--gold2)}
+.review{width:min(94vw,570px);max-height:67dvh;overflow:auto;background:#151515;border:1px solid var(--line);border-radius:18px;padding:12px}
+#strip{display:block;width:100%;height:auto;background:#f5efe6}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(94vw,570px);margin-top:12px}
+.actions .btn{min-height:54px}
+.textbtn{border:0;background:transparent;color:var(--gold2);padding:14px;letter-spacing:1.2px}
+.settings-card{width:min(94vw,570px);background:#121212;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:8px;text-align:left}
+.row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 0;border-bottom:1px solid #222}
+.row:last-child{border-bottom:0}
+.row label{font-size:13px}
+select,input{background:#1b1b1b;color:white;border:1px solid #303030;border-radius:10px;padding:10px}
+.toggle{appearance:none;width:48px;height:28px;border-radius:20px;background:#343434;position:relative;padding:0}
+.toggle:checked{background:#aa7b40}
+.toggle:after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:white;top:2px;left:3px;transition:.2s}
+.toggle:checked:after{left:21px}
+#toast{position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#202020;color:white;padding:12px 18px;border:1px solid #3a3a3a;border-radius:12px;opacity:0;transition:.25s;z-index:20;font-size:13px;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.small-note{font-size:11px;color:var(--muted)}
+@media(min-width:768px){
+  .screen{padding-left:36px;padding-right:36px}
+  .camera-wrap{height:72dvh}
+}
+</style>
+</head>
+<body>
+
+<section class="screen active" id="welcome">
+  <div class="monogram">AB</div>
+  <div class="brand">PHOTOGRAPHY</div>
+  <h1>PHOTOBOOTH</h1>
+  <p class="tag gold">CAPTURA EL MOMENTO</p>
+  <p class="sub">DISFRUTA · SONRÍE · REPITE</p>
+  <button class="btn primary big" id="start">📷<br>TOCAR PARA COMENZAR</button>
+  <button class="textbtn" id="demo">PROBAR MODO DEMO</button>
+  <p class="hint">La cámara real requiere abrir esta página desde una dirección HTTPS. El modo demo te deja revisar el flujo y el diseño inmediatamente.</p>
+</section>
+
+<section class="screen" id="camera">
+  <div class="top">
+    <button class="icon" id="cancel">←</button>
+    <div class="title"><span id="counter">1 / 4</span></div>
+    <button class="icon" id="flip">↻</button>
+  </div>
+  <div class="camera-wrap">
+    <video id="video" playsinline autoplay muted class="mirror"></video>
+    <div id="demoView">AB PHOTOBOOTH</div>
+    <div class="overlay"></div>
+    <div id="countdown" class="countdown hidden">3</div>
+    <div id="flash" class="flash"></div>
+  </div>
+  <div class="controls">
+    <button class="mini" id="settingsBtn">⚙</button>
+    <button class="shutter" id="shoot" aria-label="Tomar fotos"></button>
+    <div class="mini" style="display:flex;align-items:center;justify-content:center"><span class="progress" id="miniCount">4</span></div>
+  </div>
+  <p class="hint">Toca el botón blanco. El booth tomará las fotos automáticamente.</p>
+</section>
+
+<section class="screen" id="review">
+  <div class="top">
+    <button class="icon" id="reviewBack">←</button>
+    <div class="title">VISTA PREVIA</div><div></div>
+  </div>
+  <div class="review"><canvas id="strip" width="600" height="1800"></canvas></div>
+  <div class="actions">
+    <button class="btn secondary" id="retake">REPETIR</button>
+    <button class="btn primary" id="save">GUARDAR</button>
+  </div>
+  <button class="textbtn" id="finish">FINALIZAR</button>
+</section>
+
+<section class="screen" id="settings">
+  <div class="top">
+    <button class="icon" id="settingsBack">←</button><div class="title">CONFIGURACIÓN</div><div></div>
+  </div>
+  <div class="settings-card">
+    <div class="row"><label>Número de fotos</label>
+      <select id="photoCount"><option>1</option><option>2</option><option>3</option><option selected>4</option></select>
+    </div>
+    <div class="row"><label>Temporizador</label>
+      <select id="timer"><option value="3" selected>3 segundos</option><option value="5">5 segundos</option></select>
+    </div>
+    <div class="row"><label>Mostrar marca AB</label><input id="branding" class="toggle" type="checkbox" checked></div>
+    <div class="row"><label>Guardar originales</label><input id="originals" class="toggle" type="checkbox" checked></div>
+    <div class="row"><label>Formato</label><select id="format"><option value="strip" selected>Tira 2x6</option><option value="4x6">4x6</option></select></div>
+  </div>
+  <p class="small-note">PIN y administración avanzada se agregarán en la siguiente versión.</p>
+</section>
+
+<section class="screen" id="done">
+  <div class="monogram">AB</div><div class="brand">PHOTOGRAPHY</div>
+  <h1 style="font-size:44px">¡LISTO!</h1>
+  <p class="gold">GRACIAS POR SONREÍR CON NOSOTROS</p>
+  <button class="btn primary big" id="again" style="margin-top:30px">NUEVA SESIÓN</button>
+</section>
+
+<canvas id="capture" class="hidden"></canvas>
+<div id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const screens=[...document.querySelectorAll('.screen')];
+let stream=null,facing='user',photos=[],busy=false,demoMode=false,lastScreen='camera';
+
+function show(id){screens.forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function stopCamera(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+function setDemo(on){
+  demoMode=on;
+  $('demoView').classList.toggle('show',on);
+  $('video').classList.toggle('hidden',on);
+  $('flip').disabled=on;
+}
+
+async function openCamera(){
+  setDemo(false); stopCamera();
+  if(!navigator.mediaDevices?.getUserMedia){throw new Error('no camera api')}
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:facing},width:{ideal:1920},height:{ideal:1080}},audio:false});
+  $('video').srcObject=stream;
+  $('video').classList.toggle('mirror',facing==='user');
+  await $('video').play();
+}
+
+async function begin(real=true){
+  photos=[]; updateCount(0);
+  show('camera');
+  if(real){
+    try{ await openCamera(); }
+    catch(e){
+      setDemo(true);
+      toast('Cámara no disponible aquí. Activé modo demo.');
+    }
+  }else{
+    stopCamera(); setDemo(true);
+  }
+}
+
+function updateCount(done){
+  const total=+$('photoCount').value;
+  $('counter').textContent=`${Math.min(done+1,total)} / ${total}`;
+  $('miniCount').textContent=total;
+}
+
+async function countDown(){
+  const secs=+$('timer').value;
+  $('countdown').classList.remove('hidden');
+  for(let n=secs;n>=1;n--){$('countdown').textContent=n;await sleep(800)}
+  $('countdown').textContent='☺';await sleep(250);
+  $('countdown').classList.add('hidden');
+}
+
+function flash(){const f=$('flash');f.classList.remove('fire');void f.offsetWidth;f.classList.add('fire')}
+
+function demoPhoto(i){
+  const c=document.createElement('canvas');c.width=1200;c.height=900;
+  const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,c.width,c.height);
+  const palettes=[['#3a2618','#9f7244'],['#222','#75604b'],['#4b3728','#bd9463'],['#151515','#6d5136']];
+  const p=palettes[i%palettes.length];g.addColorStop(0,p[0]);g.addColorStop(1,p[1]);
+  x.fillStyle=g;x.fillRect(0,0,c.width,c.height);
+  x.fillStyle='#f5e4c8';x.textAlign='center';x.font='italic 74px Georgia';x.fillText('AB Photography',600,400);
+  x.font='32px -apple-system';x.fillText(`Foto demo ${i+1}`,600,465);
+  return c.toDataURL('image/jpeg',.9)
+}
+
+function snap(i){
+  if(demoMode)return demoPhoto(i);
+  const v=$('video'),c=$('capture'),vw=v.videoWidth,vh=v.videoHeight;
+  const ratio=4/3;let sx=0,sy=0,sw=vw,sh=vh;
+  if(vw/vh>ratio){sw=vh*ratio;sx=(vw-sw)/2}else{sh=vw/ratio;sy=(vh-sh)/2}
+  c.width=1200;c.height=900;const x=c.getContext('2d');
+  if(facing==='user'){x.save();x.translate(c.width,0);x.scale(-1,1);x.drawImage(v,sx,sy,sw,sh,0,0,c.width,c.height);x.restore()}
+  else x.drawImage(v,sx,sy,sw,sh,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',.92)
+}
+
+async function shoot(){
+  if(busy)return;busy=true;$('shoot').disabled=true;photos=[];
+  const total=+$('photoCount').value;
+  for(let i=0;i<total;i++){
+    updateCount(i);await countDown();photos.push(snap(i));flash();await sleep(600)
+  }
+  await buildLayout();stopCamera();show('review');busy=false;$('shoot').disabled=false
+}
+
+function img(src){return new Promise((res,rej)=>{const i=new Image;i.onload=()=>res(i);i.onerror=rej;i.src=src})}
+
+async function buildLayout(){
+  const c=$('strip'),x=c.getContext('2d'),brand=$('branding').checked,mode=$('format').value;
+  const W=600,H=mode==='strip'?1800:900;c.width=W;c.height=H;
+  x.fillStyle='#f4ede3';x.fillRect(0,0,W,H);
+  const margin=38,top=brand?120:34,bottom=brand?85:34,gap=14;
+  const count=photos.length;
+  let cols=1,rows=count;
+  if(mode==='4x6'){cols=2;rows=Math.ceil(count/2)}
+  const photoW=(W-margin*2-gap*(cols-1))/cols;
+  const avail=H-top-bottom-gap*(rows-1);
+  const photoH=avail/rows;
+  for(let i=0;i<count;i++){
+    const im=await img(photos[i]);
+    const col=i%cols,row=Math.floor(i/cols),dx=margin+col*(photoW+gap),dy=top+row*(photoH+gap);
+    const ir=im.width/im.height,tr=photoW/photoH;let sx=0,sy=0,sw=im.width,sh=im.height;
+    if(ir>tr){sw=im.height*tr;sx=(im.width-sw)/2}else{sh=im.width/tr;sy=(im.height-sh)/2}
+    x.drawImage(im,sx,sy,sw,sh,dx,dy,photoW,photoH)
+  }
+  if(brand){
+    x.fillStyle='#34291d';x.textAlign='center';x.font='italic 48px Georgia';x.fillText('AB',W/2,60);
+    x.font='15px -apple-system';x.fillText('PHOTOGRAPHY',W/2,88);
+    x.fillStyle='#8d6b3f';x.font='15px Georgia';x.fillText('CAPTURA · SONRÍE · REPITE',W/2,H-38)
+  }
+}
+
+async function saveImage(){
+  const c=$('strip');const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.95));
+  const file=new File([blob],`AB-Photobooth-${Date.now()}.jpg`,{type:'image/jpeg'});
+  if(navigator.canShare?.({files:[file]})){
+    try{await navigator.share({files:[file],title:'AB Photography Photobooth'});return}catch(e){if(e.name==='AbortError')return}
+  }
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)
+}
+
+$('start').onclick=()=>begin(true);
+$('demo').onclick=()=>begin(false);
+$('cancel').onclick=()=>{stopCamera();show('welcome')};
+$('flip').onclick=async()=>{facing=facing==='user'?'environment':'user';try{await openCamera()}catch(e){toast('No pude cambiar de cámara')}};
+$('shoot').onclick=shoot;
+$('settingsBtn').onclick=()=>{lastScreen='camera';show('settings')};
+$('settingsBack').onclick=()=>show(lastScreen);
+$('retake').onclick=()=>begin(!demoMode);
+$('reviewBack').onclick=()=>begin(!demoMode);
+$('save').onclick=saveImage;
+$('finish').onclick=()=>{photos=[];show('done')};
+$('again').onclick=()=>show('welcome');
+$('photoCount').onchange=()=>updateCount(0);
+
+if('serviceWorker'in navigator){addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
