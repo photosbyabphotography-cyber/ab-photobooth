@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#080808">
-<title>AB Photography Photobooth V2.1</title>
+<title>AB Photography Photobooth V2.2</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{
@@ -253,9 +253,27 @@ async function buildLayout(){
   for(let i=0;i<count;i++){
     const im=await img(photos[i]);
     const col=i%cols,row=Math.floor(i/cols),dx=margin+col*(photoW+gap),dy=top+row*(photoH+gap);
-    const ir=im.width/im.height,tr=photoW/photoH;let sx=0,sy=0,sw=im.width,sh=im.height;
-    if(ir>tr){sw=im.height*tr;sx=(im.width-sw)/2}else{sh=im.width/tr;sy=(im.height-sh)/2}
-    x.drawImage(im,sx,sy,sw,sh,dx,dy,photoW,photoH)
+    // Fit completo: respeta todo el encuadre capturado, sin recortar ni hacer zoom.
+    const ir = im.width / im.height;
+    const tr = photoW / photoH;
+    let dw = photoW, dh = photoH, ox = 0, oy = 0;
+
+    if (ir > tr) {
+      // La foto es proporcionalmente más ancha: ajusta por ancho.
+      dh = photoW / ir;
+      oy = (photoH - dh) / 2;
+    } else {
+      // La foto es proporcionalmente más alta: ajusta por alto.
+      dw = photoH * ir;
+      ox = (photoW - dw) / 2;
+    }
+
+    // Fondo limpio detrás de la foto para posibles márgenes.
+    x.fillStyle = '#f4ede3';
+    x.fillRect(dx, dy, photoW, photoH);
+
+    // Dibuja la imagen completa, sin crop.
+    x.drawImage(im, dx + ox, dy + oy, dw, dh)
   }
   if(brand){
     x.fillStyle='#34291d';x.textAlign='center';x.font='italic 48px Georgia';x.fillText('AB',W/2,60);

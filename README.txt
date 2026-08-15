@@ -31,3 +31,10 @@ V2.1
 - Corregido el encuadre de cámara en iPhone/iPad.
 - Vista real 4:3 sin zoom/crop artificial.
 - La vista previa ahora muestra el encuadre completo.
+
+
+V2.2
+- Corregido el zoom aparente en la composición final.
+- La plantilla ya no recorta la imagen para llenar cada cuadro.
+- La foto completa se mantiene dentro del marco, respetando el encuadre original.
+- Puede haber pequeños márgenes si la proporción de la foto y del marco no coincide; esto es intencional para evitar crop.
