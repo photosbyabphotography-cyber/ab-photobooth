@@ -38,3 +38,10 @@ V2.2
 - La plantilla ya no recorta la imagen para llenar cada cuadro.
 - La foto completa se mantiene dentro del marco, respetando el encuadre original.
 - Puede haber pequeños márgenes si la proporción de la foto y del marco no coincide; esto es intencional para evitar crop.
+
+
+V2.3
+- Corregida la captura: ya no se fuerza 4:3.
+- Se conserva la proporción real entregada por la cámara del iPhone/iPad.
+- La foto guardada mantiene todo el encuadre que entrega el video.
+- La plantilla usa fit completo, sin crop adicional.
