@@ -10,3 +10,5 @@ AB Photobooth V3 Digital
 - PWA/offline básico
 
 SIGUIENTE ETAPA: conectar almacenamiento online para que cada composición se suba y el booth genere un QR real único para el invitado. GitHub Pages aloja la app, pero no recibe dinámicamente las fotos de cada sesión.
+
+V3.1: regresó la animación de captura con flash blanco y efecto visual de obturador después de cada foto.
