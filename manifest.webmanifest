@@ -1,9 +1,8 @@
 {
-  "name": "AB Photography Photobooth",
+  "name": "AB Photography Digital Photobooth",
   "short_name": "AB Booth",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#080808",
-  "theme_color": "#080808",
-  "orientation": "any"
+  "theme_color": "#080808"
 }
